@@ -13,7 +13,7 @@ Page({
     goodsJsonStr:""
   },
   onShow : function () {
-    this.initShippingAddress();
+    //this.initShippingAddress();
   },
   onLoad: function (e) {
     var that = this;
@@ -82,22 +82,27 @@ Page({
     //   postData.mobile = that.data.curAddressData.mobile;
     //   postData.code = that.data.curAddressData.code;
     // }
+    var goodslist = that.data.goodsList, _all_count = 0;
+    for (var i = 0; i < goodslist.length;i++){
+      _all_count += Number(goodslist[i].number);
+    }
     var orderData = {};
     var User = that.globalData.users;
     orderData.client_id = User.client_id;
     orderData.order_amount = this.data.allGoodsPrice;
-    orderData.order_count = that.globalData.null;
-    orderData.order_expfee = that.globalData.null;
-    orderData.user_name = User.user_name;
-    orderData.tel_number = User.tel_number;
-    orderData.province = User.province;
-    orderData.city = User.city;
-    orderData.address = User.address;
-    orderData.postal_code = User.postal_code;
-    orderData.exptime = User.exptime;
-    orderData.leword = User.leword;
+    orderData.order_count = _all_count;
+    orderData.order_expfee = 0;
+    //orderData.user_name = User.user_name;
+    //orderData.tel_number = User.tel_number;
+    //orderData.province = User.province;
+    //orderData.city = User.city;
+    //orderData.address = User.address;
+    //orderData.postal_code = User.postal_code;
+    //orderData.exptime = User.exptime;
+    orderData.leword = e.detail.value.remark;
     wx.request({
-      url: "https://api.it120.cc/"+ app.globalData.subDomain +'/order/create',
+      //url: "https://api.it120.cc/"+ app.globalData.subDomain +'/order/create',
+      url: app.globalData.domains + "/Orders/CreateOrder",
       method:'POST',
       header: {
         'content-type': 'application/x-www-form-urlencoded'
@@ -105,11 +110,11 @@ Page({
       data: orderData, // 设置请求的 参数
       success: (res) =>{
         wx.hideLoading();
-        console.log(res.data);
-        if (res.data.code != 0) {
+        var r = res.data;
+        if (r.ack != "success") {
           wx.showModal({
             title: '错误',
-            content: res.data.msg,
+            content: r.errorMsg,
             showCancel: false
           })
           return;

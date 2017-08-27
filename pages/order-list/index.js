@@ -90,6 +90,29 @@ Page({
   },
   onShow:function(){
     // 获取订单列表
+    if (!app.globalData.users){
+        //  wx.showModal({
+        //      title: '提示',
+        //      content: '您还未登录',
+        //      confirm:true
+        //   });
+         wx.showModal({
+           title: '提示',
+           content: '您还未登录',showCancel:false,
+           success: function (res) {
+             if (res.confirm) {
+                wx.reLaunch({
+                  url: "/pages/index/index"
+                });
+             } else if (res.cancel) {
+               wx.reLaunch({
+                 url: "/pages/index/index"
+               });
+             }
+           }
+         })
+         return;
+    }
     wx.showLoading();
     var that = this;
     var postData = {
@@ -107,10 +130,11 @@ Page({
     if (that.data.currentTpye == 4) {
       postData.status = 4
     }
-    this.getOrderStatistics();
+    //this.getOrderStatistics();
     wx.request({
-      url: "https://api.it120.cc/" + app.globalData.subDomain + '/order/list',
-      data: postData,
+      //url: "https://api.it120.cc/" + app.globalData.subDomain + '/order/list',
+      url: app.globalData.domains + "/Orders/OrdersLists",
+      data: {client_id:that.globalData.users.client_id,status:0},
       success: (res) => {
         wx.hideLoading();
         if (res.data.code == 0) {
