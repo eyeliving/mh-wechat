@@ -22,16 +22,16 @@ Page({
     if (shopCarInfoMem && shopCarInfoMem.shopList) {
       shopList = shopCarInfoMem.shopList
     }
-    var isNeedLogistics = 0;
+    //var isNeedLogistics = 0;
     var allGoodsPrice = 0;
 
     var goodsJsonStr = "[";
     for (var i =0; i < shopList.length; i++) {
       var carShopBean = shopList[i];
       console.log(carShopBean);
-      if (carShopBean.logisticsType > 0) {
-        isNeedLogistics = 1;
-      }
+      // if (carShopBean.logisticsType > 0) {
+      //   isNeedLogistics = 1;
+      // }
       allGoodsPrice += carShopBean.price * carShopBean.number
 
       var goodsJsonStrTmp = '';
@@ -44,7 +44,7 @@ Page({
     goodsJsonStr += "]";
     that.setData({
       goodsList:shopList,
-      isNeedLogistics:isNeedLogistics,
+      //isNeedLogistics:isNeedLogistics,
       allGoodsPrice:allGoodsPrice,
       goodsJsonStr:goodsJsonStr
     });

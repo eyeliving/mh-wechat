@@ -113,12 +113,9 @@ Page({
       },
       success: function(res) {
         var r = res.data;
-        that.setData({
-          goods:[],
-          loadingMoreHidden:true
-        });
         if (r.ack != "success"){
             that.setData({
+              goods: [],
               loadingMoreHidden: false,
             });
             return;
@@ -129,6 +126,7 @@ Page({
         }
         that.setData({
           goods:goods,
+          loadingMoreHidden: true
         });
       }
     })

@@ -70,14 +70,14 @@ Page({
       })
       return
     }
-    if (code == ""){
-      wx.showModal({
-        title: '提示',
-        content: '请填写邮编',
-        showCancel:false
-      })
-      return
-    }
+    // if (code == ""){
+    //   wx.showModal({
+    //     title: '提示',
+    //     content: '请填写邮编',
+    //     showCancel:false
+    //   })
+    //   return
+    // }
     var apiAddoRuPDATE = "add";
     var apiAddid = that.data.id;
     if (apiAddid) {
@@ -96,7 +96,7 @@ Page({
         linkMan:linkMan,
         address:address,
         mobile:mobile,
-        code:code,
+        //code:code,
         isDefault:'true'
       },
       success: function(res) {

@@ -49,7 +49,6 @@ Page({
     })
 
     wx.request({
-      //url: "https://api.it120.cc/"+ app.globalData.subDomain +'/shop/goods/detail',
       url: app.globalData.domains + "/Product/ProductInfoById",
       data: {
         product_id: e.id
@@ -178,7 +177,7 @@ Page({
     })  
   },
   addShopCar:function(){
-    if (this.data.goodsDetail.properties && !this.data.canSubmit) {
+    if (this.data.goodsDetail.spec_det_data.length>0 && !this.data.canSubmit) {
       this.bindGuiGeTap();
       return;
     }
