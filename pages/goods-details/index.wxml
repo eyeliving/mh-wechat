@@ -50,11 +50,11 @@
                 <view class="pop-goods-close" bindtap="closePopupTap"></view>
              </view>
              <view class="size-label-box">
-                <block wx:for="{{goodsDetail.properties}}" wx:for-item="property" wx:for-index="idx">
-                <view class="label">{{property.name}}</view> 
+                <block wx:for="{{goodsDetail.spec_det_data}}" wx:for-item="property" wx:for-index="idx">
+                <view class="label">{{property.spec_name}}</view> 
                 <view class="label-item-box">
-                    <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{property.childsCurGoods}}" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{property.id}}" data-propertyname="{{property.name}}" data-propertychildindex="{{index}}" data-propertychildid="{{item.id}}" data-propertychildname="{{item.name}}">
-                        {{item.name}}
+                    <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{property.list}}" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{property.id}}" data-propertyname="{{property.spec_name}}" data-propertychildindex="{{index}}" data-propertychildid="{{item.spec_det_id}}" data-propertychildprice="{{item.sale_price}}" data-propertychildname="{{item.det_name}}">
+                        {{item.det_name}}=={{item.sale_price}}
                     </view> 
                 </view>
                 </block>

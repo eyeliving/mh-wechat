@@ -125,56 +125,49 @@ Page({
     console.log(e.currentTarget.dataset.propertychildname)
     */
     // 取消该分类下的子栏目所有的选中状态
-    var childs = that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods;
+    var childs = that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list;
     for(var i = 0;i < childs.length;i++){
-      that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods[i].active = false;
+      that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list[i].active = false;
     }
     // 设置当前选中状态
-    that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods[e.currentTarget.dataset.propertychildindex].active = true;
+    that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list[e.currentTarget.dataset.propertychildindex].active = true;
     // 获取所有的选中规格尺寸数据
-    var needSelectNum = that.data.goodsDetail.properties.length;
+    var needSelectNum = that.data.goodsDetail.spec_det_data.length;
     var curSelectNum = 0;
     var propertyChildIds= "";
     var propertyChildNames = "";
-    for (var i = 0;i < that.data.goodsDetail.properties.length;i++) {
-      childs = that.data.goodsDetail.properties[i].childsCurGoods;
+    var all_price = Number(that.data.goodsDetail.sale_prices);//所有选中的规格价
+    for (var i = 0; i < that.data.goodsDetail.spec_det_data.length;i++) {
+      childs = that.data.goodsDetail.spec_det_data[i].list;
       for (var j = 0;j < childs.length;j++) {
         if(childs[j].active){
           curSelectNum++;
-          propertyChildIds = propertyChildIds + that.data.goodsDetail.properties[i].id + ":"+ childs[j].id +",";
-          propertyChildNames = propertyChildNames + that.data.goodsDetail.properties[i].name + ":"+ childs[j].name +"  ";
+          all_price += Number(childs[j].sale_price)
+          //propertyChildIds = propertyChildIds + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].spec_det_id +",";
+          //propertyChildNames = propertyChildNames + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name +"  ";
         }
       }
     }
     var canSubmit = false;
-    if (needSelectNum == curSelectNum) {
+    if (needSelectNum == curSelectNum) {//各个分类规格都必选一个
       canSubmit = true;
     }
     // 计算当前价格
-    if (canSubmit) {
-      wx.request({
-        url: "https://api.it120.cc/"+ app.globalData.subDomain +'/shop/goods/price',
-        data: {
-          goodsId: that.data.goodsDetail.basicInfo.id,
-          propertyChildIds:propertyChildIds
-        },
-        success: function(res) {
-          that.setData({
-            selectSizePrice:res.data.data.price,
-            propertyChildIds:propertyChildIds,
-            propertyChildNames:propertyChildNames,
-            buyNumMax:res.data.data.stores,
-            buyNumber:(res.data.data.stores>0) ? 1: 0
-          });
-        }
-      })
-    }
+    //if (canSubmit) {
+      that.setData({
+        selectSizePrice: all_price,
+        //propertyChildIds: propertyChildIds,
+        //propertyChildNames: propertyChildNames,
+        //buyNumMax: res.data.data.stores,
+        //buyNumber: (res.data.data.stores > 0) ? 1 : 0
+
+        goodsDetail: that.data.goodsDetail,
+        canSubmit: canSubmit
+      });
+    //}
 
     
-    this.setData({
-      goodsDetail: that.data.goodsDetail,
-      canSubmit:canSubmit
-    })  
+  
   },
   addShopCar:function(){
     if (this.data.goodsDetail.spec_det_data.length>0 && !this.data.canSubmit) {
@@ -253,7 +246,7 @@ Page({
     });
   },
   tobuy:function(){
-    if (this.data.goodsDetail.properties && !this.data.canSubmit) {
+    if (this.data.goodsDetail.spec_det_data && !this.data.canSubmit) {
       this.bindGuiGeTap();
       return;
     }
