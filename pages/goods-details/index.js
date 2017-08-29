@@ -144,7 +144,7 @@ Page({
           curSelectNum++;
           all_price += Number(childs[j].sale_price)
           //propertyChildIds = propertyChildIds + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].spec_det_id +",";
-          //propertyChildNames = propertyChildNames + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name +"  ";
+          propertyChildNames = propertyChildNames + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name +"  ";
         }
       }
     }
@@ -157,7 +157,7 @@ Page({
       that.setData({
         selectSizePrice: all_price,
         //propertyChildIds: propertyChildIds,
-        //propertyChildNames: propertyChildNames,
+        propertyChildNames: propertyChildNames,
         //buyNumMax: res.data.data.stores,
         //buyNumber: (res.data.data.stores > 0) ? 1 : 0
 
@@ -189,7 +189,7 @@ Page({
     shopCarMap.name = this.data.goodsDetail.product_name;
     //shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
     //shopCarMap.propertyChildIds=this.data.propertyChildIds;
-    //shopCarMap.label=this.data.propertyChildNames;
+    shopCarMap.label=this.data.propertyChildNames;
     shopCarMap.price = this.data.selectSizePrice;
     shopCarMap.left = "";
     shopCarMap.active = true;
