@@ -22,13 +22,20 @@ App({
       return;
     }
     wx.login({
-      success: function (res) {
+      success: function (res) {console.log(res.code+" ===")
         wx.request({
-          url: "https://api.it120.cc/"+ that.globalData.subDomain +'/user/wxapp/login',
+          url: that.globalData.domains+"/User/GetOpenId",
           data: {
-            code: res.code
+            code: res.code, 
+            app_id: 'wx1da05f244060447a', 
+            app_secret:'02e97eafc12217cbafc39fdaf8eda81e'
           },
           success: function(res) {
+            var r = res.data;
+            console.log(res.data);
+            if(r.ack == "success") {
+              that.globalData.token = r.data['3rd_session'];
+            }
             // if (res.data.code == 10000) {
             //   // 去注册
             //   that.registerUser();
@@ -49,6 +56,36 @@ App({
         })
       }
     })
+
+
+    // wx.login({
+    //   success: function (res) {
+    //     wx.request({
+    //       url: "https://api.it120.cc/" + that.globalData.subDomain + '/user/wxapp/login',
+    //       data: {
+    //         code: res.code
+    //       },
+    //       success: function (res) {
+    //         // if (res.data.code == 10000) {
+    //         //   // 去注册
+    //         //   that.registerUser();
+    //         //   return;
+    //         // }
+    //         // if (res.data.code != 0) {
+    //         //   // 登录错误 
+    //         //   wx.hideLoading();
+    //         //   wx.showModal({
+    //         //     title: '提示',
+    //         //     content: '无法登录，请重试',
+    //         //     showCancel:false
+    //         //   })
+    //         //   return;
+    //         // }
+    //         // that.globalData.token = res.data.data.token;
+    //       }
+    //     })
+    //   }
+    // })
   },
   registerUser: function () {
     var that = this;
