@@ -37,11 +37,11 @@ Page({
     })
   },
   tapBanner: function(e) {
-    if (e.currentTarget.dataset.id != 0) {
-      wx.navigateTo({
-        url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
-      })
-    }
+    // if (e.currentTarget.dataset.id != 0) {
+    //   wx.navigateTo({
+    //     url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
+    //   })
+    // }
   },
   bindTypeTap: function(e) {
      this.setData({  
@@ -72,14 +72,14 @@ Page({
     })
     */
     wx.request({
-      url: "https://api.it120.cc/"+ app.globalData.subDomain +'/banner/list',
-      data: {
-        key: 'mallName'
-      },
+      url: app.globalData.domains + "/Banners/GetBanners",
       success: function(res) {
-        that.setData({
-          banners: res.data.data
-        });
+        var r = res.data;
+        if (r.ack == "success") {
+          that.setData({
+            banners: r.data
+          });
+        }
       }
     })
     wx.request({
