@@ -34,13 +34,13 @@ Page({
     })  
   },
   onLoad: function (e) {
-    console.log('onLoad');
+    //console.log('onLoad');
     var that = this;
     // 获取购物车数据
     wx.getStorage({
       key: 'shopCarInfo',
       success: function(res) {
-        console.log(res.data)
+        //console.log(res.data)
         that.setData({
           shopCarInfo:res.data,
           shopNum:res.data.shopNum
