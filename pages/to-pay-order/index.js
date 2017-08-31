@@ -139,7 +139,7 @@ Page({
         var r = res.data;
         if (r.ack != "success") {
           that.setData({
-            curAddressData:res.data.data
+            curAddressData: { address: r.data.client_address, mobile: r.data.mobile, linkMan:'对对对'}
           });
         }
       }
