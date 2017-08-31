@@ -13,7 +13,7 @@ Page({
     goodsJsonStr:""
   },
   onShow : function () {
-    //this.initShippingAddress();
+    this.initShippingAddress();
   },
   onLoad: function (e) {
     var that = this;
@@ -101,7 +101,6 @@ Page({
     //orderData.exptime = User.exptime;
     orderData.leword = e.detail.value.remark;
     wx.request({
-      //url: "https://api.it120.cc/"+ app.globalData.subDomain +'/order/create',
       url: app.globalData.domains + "/Orders/CreateOrder",
       method:'POST',
       header: {
@@ -131,13 +130,14 @@ Page({
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: "https://api.it120.cc/"+ app.globalData.subDomain +'/user/shipping-address/default',
+      url: app.globalData.domains + '/User/GetUserAddress',
       data: {
-        token:app.globalData.token
+        rd_session: app.globalData.rd_session
       },
       success: (res) =>{
         console.log(res.data)
-        if (res.data.code == 0) {
+        var r = res.data;
+        if (r.ack != "success") {
           that.setData({
             curAddressData:res.data.data
           });
