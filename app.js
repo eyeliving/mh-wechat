@@ -8,13 +8,26 @@ App({
           success: function(){
             //session未过期，并且在本生命周期一直有效
             //验证rd_session是否合法【可选】
-            //更新app data
-            that.globalData.rd_session = rd_session
+            wx.request({
+              url: that.globalData.domains + '/User/CheckLogin',
+              data: {rd_session: rd_session},
+              success: function (res) {
+                var r = res.data;
+                if (r.ack != 'success') {
+                  //清空无效的rd_session
+                  that.globalData.rd_session = null;
+                  that.login();
+                }else if(r.ack == 'success'){
+                  //更新app data
+                  that.globalData.rd_session = rd_session
+                }
+              }
+            });
           },
           fail: function(){
-            //登录态过期 清空无用的rd_session并重新登录
+            //登录态过期 清空已失效的rd_session //每次login,后端都会更新rd_session有效期，所以登录态已过期，服务器端也可能过期了
             wx.setStorage({key:'rd_session',data:''});
-            that.login()
+            that.login();
           }
         });
 		}else{
@@ -34,10 +47,10 @@ App({
           },
           success: function (res) {
             var r = res.data;
-            if (r.ack == 'success') {
+            if (r.ack == 'success') {//测试大小写SUCCESS
               that.globalData.rd_session = r.data.rd_session;
               wx.setStorage({key:'rd_session',data:r.data.rd_session});
-            } else if (r.ack == 'FAILURE'){
+            } else if (r.ack == 'failure'){
               that.globalData.openid = r.data.openid;
               that.registerUser();
               return;
