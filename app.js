@@ -55,7 +55,7 @@ App({
               that.registerUser();
               return;
             } else {
-              wx.hideLoading();
+              //wx.hideLoading();
               wx.showModal({title: '提示', content: r.errorMsg,showCancel: false});
               return;
             }
@@ -84,7 +84,7 @@ App({
               url: that.globalData.domains + '/User/CreateUser',
               data: _data,
               success: (res) =>{
-                wx.hideLoading();
+                //wx.hideLoading();
                 var r = res.data;
                 if (r.ack == 'success') {
                   that.globalData.rd_session = r.data.rd_session;
