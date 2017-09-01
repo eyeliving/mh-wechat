@@ -108,7 +108,7 @@ Page({
     //      })
     //      return;
     // }
-    wx.showLoading();
+    wx.showLoading({ title: '正在获取订单' });
     var that = this;
     var postData = {
       token: app.globalData.rd_session

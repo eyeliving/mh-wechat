@@ -14,12 +14,16 @@ App({
               success: function (res) {
                 var r = res.data;
                 if (r.ack != 'success') {
-                  //清空无效的rd_session
-                  that.globalData.rd_session = null;
-                  that.login();
+                  wx.showModal({ title: '提示', content: r.errorMsg, showCancel: false });
                 }else if(r.ack == 'success'){
-                  //更新app data
-                  that.globalData.rd_session = rd_session
+                  if (r.data.is_login == 'Y'){
+                    //更新app data
+                    that.globalData.rd_session = rd_session
+                  } else if (r.data.is_login == 'N'){
+                    //清空无效的rd_session
+                    that.globalData.rd_session = null;
+                    that.login();
+                  }
                 }
               }
             });
@@ -39,7 +43,7 @@ App({
     wx.login({
       success: function (res) {
         wx.request({
-          url: that.globalData.domains+"/User/GetOpenId",
+          url: that.globalData.domains +"/User/Login",
           data: {
             code: res.code, 
             app_id: 'wx1da05f244060447a', 
@@ -99,7 +103,7 @@ App({
     userInfo:null,
     subDomain:"mall",
 	  defaultsite:"https://api.it120.cc/",
-    domains:'http://112.74.92.30',//'https://shop.szzbjt.com',
+    domains: 'http://112.74.92.30',//https://shop.szzbjt.com
     users:null,
     rd_session:null,
     openid:null

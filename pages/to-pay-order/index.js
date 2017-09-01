@@ -13,7 +13,7 @@ Page({
     goodsJsonStr:""
   },
   onShow : function () {
-    this.initShippingAddress();
+    //this.initShippingAddress();
   },
   onLoad: function (e) {
     var that = this;
@@ -51,7 +51,7 @@ Page({
 
   },
   createOrder:function (e) {
-    wx.showLoading();
+    wx.showLoading({title: '正在提交订单'});
     var that = this;
     var loginToken = app.globalData.token // 用户登录 token
     var remark = e.detail.value.remark; // 备注信息
@@ -82,31 +82,35 @@ Page({
     //   postData.mobile = that.data.curAddressData.mobile;
     //   postData.code = that.data.curAddressData.code;
     // }
-    var goodslist = that.data.goodsList, _all_count = 0;
+    var goodslist = that.data.goodsList, _all_count = 0, productData = [];
     for (var i = 0; i < goodslist.length;i++){
       _all_count += Number(goodslist[i].number);
+      var _pobj = {"Product_id": goodslist[i].goodsId,"Product_count": goodslist[i].number,"Product_price": goodslist[i].price}
+      productData.push(_pobj);
     }
     var orderData = {};
-    var User = that.globalData.users;
-    orderData.client_id = User.client_id;
+    //var User = that.globalData.users;
+    orderData.client_id = '';
     orderData.order_amount = this.data.allGoodsPrice;
     orderData.order_count = _all_count;
     orderData.order_expfee = 0;
-    //orderData.user_name = User.user_name;
-    //orderData.tel_number = User.tel_number;
-    //orderData.province = User.province;
-    //orderData.city = User.city;
-    //orderData.address = User.address;
+    orderData.user_name = '大王';
+    orderData.tel_number = '13613007817';
+    orderData.province = '广东省';
+    orderData.city = '深圳市';
+    orderData.district = '龙华';
+    orderData.address = '民治世界金融中心';
     //orderData.postal_code = User.postal_code;
-    //orderData.exptime = User.exptime;
+    orderData.exptime = '2017-09-07';
     orderData.leword = e.detail.value.remark;
+    orderData.productData = productData;
     wx.request({
       url: app.globalData.domains + "/Orders/CreateOrder",
       method:'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        //'content-type': 'application/x-www-form-urlencoded'
       },
-      data: orderData, // 设置请求的 参数
+      data: { orderData: orderData}, // 设置请求的 参数
       success: (res) =>{
         wx.hideLoading();
         var r = res.data;
