@@ -1,28 +1,28 @@
 //app.js
 App({
   onLaunch: function () {
-    var that = this;
-    var rd_session = wx.getStorageSync('rd_session') || '';
-		if(rd_session){
-        wx.checkSession({
-          success: function(){
-            //session未过期，并且在本生命周期一直有效
-            //验证rd_session是否合法【可选】
-            //更新app data
-            that.globalData.rd_session = rd_session
-          },
-          fail: function(){
-            //登录态过期 清空无用的rd_session并重新登录
-            wx.setStorage({key:'rd_session',data:''});
-            that.login()
-          }
-        });
-		}else{
-        that.login();
-		}
+    this.login();
   },
   login : function () {
     var that = this;
+    var rd_session = that.globalData.rd_session;
+    if (rd_session) {
+      wx.request({
+        url: that.globalData.domains + '/User/CheckLogin',
+        data: {
+          rd_session: rd_session
+        },
+        success: function (res) {
+          var r = res.data;
+          if (r.ack != 'SUCCESS') {
+            that.globalData.rd_session = null;
+            that.globalData.openid = null;
+            that.login();
+          }
+        }
+      })
+      return;
+    }
     wx.login({
       success: function (res) {
         wx.request({
@@ -36,25 +36,30 @@ App({
             var r = res.data;
             if (r.ack == 'success') {
               that.globalData.rd_session = r.data.rd_session;
-              wx.setStorage({key:'rd_session',data:r.data.rd_session});
             } else if (r.ack == 'FAILURE'){
               that.globalData.openid = r.data.openid;
               that.registerUser();
               return;
-            } else {
+            }else{
               wx.hideLoading();
-              wx.showModal({title: '提示', content: r.errorMsg,showCancel: false});
+              wx.showModal({
+                title: '提示',
+                content: r.errorMsg,
+                showCancel: false
+              })
               return;
             }
           }
         })
       }
-    });
+    })
   },
   registerUser: function () {
     var that = this;
-    //wx.login一定会登录过，所以直接调用wx.getUserInfo
-    wx.getUserInfo({
+    wx.login({
+      success: function (res) {
+        var code = res.code; // 微信登录接口返回的 code 参数，下面注册接口需要用到
+        wx.getUserInfo({
           lang:'zh_CN',
           success: function (res) {
             var _user = res.userInfo;
@@ -66,7 +71,7 @@ App({
               client_wechat_openid: that.globalData.openid,
               client_province: _user.province,
               client_city: _user.city
-            };
+            }
             wx.request({
               url: that.globalData.domains + '/User/CreateUser',
               data: _data,
@@ -75,14 +80,19 @@ App({
                 var r = res.data;
                 if (r.ack == 'success') {
                   that.globalData.rd_session = r.data.rd_session;
-                  wx.setStorage({key:'rd_session',data:r.data.rd_session});
                 }else{
-                  wx.showModal({title: '提示',content: r.errorMsg,showCancel: false});
+                  wx.showModal({
+                    title: '提示',
+                    content: r.errorMsg,
+                    showCancel: false
+                  })
                 }
               }
             })
           }
-        });
+        })
+      }
+    })
   },
   globalData:{
     userInfo:null,

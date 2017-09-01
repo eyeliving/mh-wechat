@@ -90,33 +90,28 @@ Page({
   },
   onShow:function(){
     // 获取订单列表
-    if (!app.globalData.users){
-        //  wx.showModal({
-        //      title: '提示',
-        //      content: '您还未登录',
-        //      confirm:true
-        //   });
-         wx.showModal({
-           title: '提示',
-           content: '您还未登录',showCancel:false,
-           success: function (res) {
-             if (res.confirm) {
-                wx.reLaunch({
-                  url: "/pages/index/index"
-                });
-             } else if (res.cancel) {
-               wx.reLaunch({
-                 url: "/pages/index/index"
-               });
-             }
-           }
-         })
-         return;
-    }
+    // if (!app.globalData.users){
+    //      wx.showModal({
+    //        title: '提示',
+    //        content: '您还未登录',showCancel:false,
+    //        success: function (res) {
+    //          if (res.confirm) {
+    //             wx.reLaunch({
+    //               url: "/pages/index/index"
+    //             });
+    //          } else if (res.cancel) {
+    //            wx.reLaunch({
+    //              url: "/pages/index/index"
+    //            });
+    //          }
+    //        }
+    //      })
+    //      return;
+    // }
     wx.showLoading();
     var that = this;
     var postData = {
-      token: app.globalData.token
+      token: app.globalData.rd_session
     };
     if (that.data.currentTpye == 1) {
       postData.status = 0
@@ -132,9 +127,8 @@ Page({
     }
     //this.getOrderStatistics();
     wx.request({
-      //url: "https://api.it120.cc/" + app.globalData.subDomain + '/order/list',
       url: app.globalData.domains + "/Orders/OrdersLists",
-      data: {client_id:that.globalData.users.client_id,status:0},
+      data: postData,
       success: (res) => {
         wx.hideLoading();
         if (res.data.code == 0) {
@@ -150,6 +144,21 @@ Page({
             goodsMap: {}
           });
         }
+      },
+      fail:(res) => {
+        wx.hideLoading();
+        wx.showModal({
+           title: '提示',
+           content: '请求错误，请稍后尝试',showCancel:false,
+           success: function (res) {
+             console.log(res)
+            //  if (res.confirm) {
+               
+            //  }else if (res.cancel) {
+              
+            //  }
+           }
+        })
       }
     })
     
