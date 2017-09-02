@@ -13,7 +13,7 @@ Page({
     goodsJsonStr:""
   },
   onShow : function () {
-    //this.initShippingAddress();
+    this.initShippingAddress();
   },
   onLoad: function (e) {
     var that = this;
@@ -28,7 +28,6 @@ Page({
     var goodsJsonStr = "[";
     for (var i =0; i < shopList.length; i++) {
       var carShopBean = shopList[i];
-      console.log(carShopBean);
       // if (carShopBean.logisticsType > 0) {
       //   isNeedLogistics = 1;
       // }
@@ -116,7 +115,7 @@ Page({
         var r = res.data;
         if (r.ack != "success") {
           wx.showModal({
-            title: '错误',
+            title: '提示',
             content: r.errorMsg,
             showCancel: false
           })
@@ -139,12 +138,21 @@ Page({
         rd_session: app.globalData.rd_session
       },
       success: (res) =>{
-        console.log(res.data)
         var r = res.data;
-        if (r.ack != "success") {
+        if (r.ack == "success") {
+          var _address_list = r.data, curAddressData = {};
+          for (var i=0;i<_address_list.length;i++){
+            if (_address_list[i].is_default=='1'){
+              curAddressData.linkMan = _address_list[i].consignee;
+              curAddressData.mobile = _address_list[i].mobile;
+              curAddressData.address = _address_list[i].address;
+            }
+          }
           that.setData({
-            curAddressData: { address: r.data.client_address, mobile: r.data.mobile, linkMan:'对对对'}
+            curAddressData: curAddressData
           });
+        }else{
+          r.errorMsg &&wx.showModal({title: '提示',content: r.errorMsg,showCancel: false})
         }
       }
     })
