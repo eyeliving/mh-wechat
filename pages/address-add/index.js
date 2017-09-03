@@ -18,10 +18,10 @@ Page({
   },
   bindSave: function(e) {
     var that = this;
-    var linkMan = e.detail.value.linkMan;
-    var address = e.detail.value.address;
-    var mobile = e.detail.value.mobile;
-    var code = e.detail.value.code;
+    var linkMan = e.detail.value.cart_consignee;
+    var address = e.detail.value.cart_address;
+    var mobile = e.detail.value.cart_mobile;
+    //var code = e.detail.value.code;
 
     if (linkMan == ""){
       wx.showModal({
@@ -55,12 +55,12 @@ Page({
       })
       return
     }
-    var cityId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].id;
-    var districtId;
+    var city_name = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].name;
+    var district_name;
     if (this.data.selDistrict == "请选择"){
-      districtId = cityId;
+      district_name = city_name;
     } else {
-      districtId = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].id;
+      district_name = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].name;
     }
     if (address == ""){
       wx.showModal({
@@ -70,50 +70,76 @@ Page({
       })
       return
     }
-    // if (code == ""){
-    //   wx.showModal({
-    //     title: '提示',
-    //     content: '请填写邮编',
-    //     showCancel:false
-    //   })
-    //   return
-    // }
-    var apiAddoRuPDATE = "add";
-    var apiAddid = that.data.id;
-    if (apiAddid) {
-      apiAddoRuPDATE = "update";
-    } else {
-      apiAddid = 0;
+    var _url = '/User/AddUserCartAddress',_data = {
+      rd_session: app.globalData.rd_session,
+      province: commonCityData.cityData[this.data.selProvinceIndex].name,
+      city: city_name,
+      district: district_name,
+      consignee: linkMan,
+      address: address,
+      mobile: mobile,
+      is_default: '1'
+    };
+    if (that.data.id) {
+      _url = '/User/ModifyUserCartAddress';
+      _data.id = that.data.id;
     }
+    wx.showLoading({ title: '正在提交' });
     wx.request({
-      url: "https://api.it120.cc/" + app.globalData.subDomain + '/user/shipping-address/' + apiAddoRuPDATE,
-      data: {
-        token: app.globalData.token,
-        id: apiAddid,
-        provinceId: commonCityData.cityData[this.data.selProvinceIndex].id,
-        cityId: cityId,
-        districtId: districtId,
-        linkMan:linkMan,
-        address:address,
-        mobile:mobile,
-        //code:code,
-        isDefault:'true'
-      },
+      url: app.globalData.domains + _url,
+      data: _data,
       success: function(res) {
-        if (res.data.code != 0) {
-          // 登录错误 
+        var r = res.data;
+        if (r.ack == 'success') { 
+          // 跳转到结算页面
+          wx.navigateBack({})
+        }else{
           wx.hideLoading();
           wx.showModal({
-            title: '失败',
-            content: res.data.msg,
-            showCancel:false
-          })
+            title: '提示',
+            content: r.errorMsg,
+            showCancel: false
+          });
           return;
         }
-        // 跳转到结算页面
-        wx.navigateBack({})
       }
     })
+    // var apiAddoRuPDATE = "add";
+    // var apiAddid = that.data.id;
+    // if (apiAddid) {
+    //   apiAddoRuPDATE = "update";
+    // } else {
+    //   apiAddid = 0;
+    // }
+    // wx.request({
+    //   url: "https://api.it120.cc/" + app.globalData.subDomain + '/user/shipping-address/' + apiAddoRuPDATE,
+    //   data: {
+    //     token: app.globalData.token,
+    //     id: apiAddid,
+    //     provinceId: commonCityData.cityData[this.data.selProvinceIndex].id,
+    //     cityId: cityId,
+    //     districtId: districtId,
+    //     linkMan:linkMan,
+    //     address:address,
+    //     mobile:mobile,
+    //     //code:code,
+    //     isDefault:'true'
+    //   },
+    //   success: function(res) {
+    //     if (res.data.code != 0) {
+    //       // 登录错误 
+    //       wx.hideLoading();
+    //       wx.showModal({
+    //         title: '失败',
+    //         content: res.data.msg,
+    //         showCancel:false
+    //       })
+    //       return;
+    //     }
+    //     // 跳转到结算页面
+    //     wx.navigateBack({})
+    //   }
+    // })
   },
   initCityData:function(level, obj){
     if(level == 1){
@@ -181,22 +207,27 @@ Page({
       // 初始化原数据
       wx.showLoading();
       wx.request({
-        url: "https://api.it120.cc/" + app.globalData.subDomain + '/user/shipping-address/detail',
+        url: app.globalData.domains + '/User/GetUserCartAddress',
         data: {
-          token: app.globalData.token,
-          id: id
+          rd_session: app.globalData.rd_session,
+          id:id
         },
         success: function (res) {
           wx.hideLoading();
-          if (res.data.code == 0) {
-            that.setData({
-              id:id,
-              addressData: res.data.data,
-              //selProvince: res.data.data.provinceStr,
-              //selCity: res.data.data.cityStr,
-              //selDistrict: res.data.data.areaStr
-            });
-            return;
+          var r = res.data;
+          if (r.ack == "success") {
+            var _list = r.data;
+            for (var i = 0;i<_list.length;i++){
+              if (_list[i].id==id){
+                that.setData({
+                  id: id,
+                  addressData: _list[i],
+                  selProvince: _list[i].cart_province,
+                  selCity: _list[i].cart_city,
+                  selDistrict: _list[i].cart_district
+                });
+              }
+            }
           } else {
             wx.showModal({
               title: '提示',
@@ -221,9 +252,9 @@ Page({
       success: function (res) {
         if (res.confirm) {
           wx.request({
-            url: "https://api.it120.cc/" + app.globalData.subDomain + '/user/shipping-address/delete',
+            url: app.globalData.domains + '/User/DeleteUserCartAddress',
             data: {
-              token: app.globalData.token,
+              rd_session: app.globalData.rd_session,
               id: id
             },
             success: (res) => {
@@ -231,7 +262,7 @@ Page({
             }
           })
         } else if (res.cancel) {
-          console.log('用户点击取消')
+          //console.log('用户点击取消')
         }
       }
     })

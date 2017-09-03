@@ -21,6 +21,7 @@ Page({
 
     propertyChildIds:"",
     propertyChildNames:"",
+    childId:'',
     canSubmit:false, //  选中规格尺寸时候是否允许加入购物车
     shopCarInfo:{},
     pics:[]
@@ -136,18 +137,33 @@ Page({
     var curSelectNum = 0;
     var propertyChildIds= "";
     var propertyChildNames = "";
-    var all_price = Number(that.data.goodsDetail.sale_prices);//所有选中的规格价
+    //规格多类多选
+    // var all_price = Number(that.data.goodsDetail.sale_prices);//所有选中的规格价
+    // for (var i = 0; i < that.data.goodsDetail.spec_det_data.length;i++) {
+    //   childs = that.data.goodsDetail.spec_det_data[i].list;
+    //   for (var j = 0;j < childs.length;j++) {
+    //     if(childs[j].active){
+    //       curSelectNum++;
+    //       all_price += Number(childs[j].sale_price)
+    //       //propertyChildIds = propertyChildIds + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].spec_det_id +",";
+    //       propertyChildNames = propertyChildNames + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name +"  ";
+    //     }
+    //   }
+    // }
+    //规格只有一类单选
+    var all_price = 0,all_pid = '';
     for (var i = 0; i < that.data.goodsDetail.spec_det_data.length;i++) {
       childs = that.data.goodsDetail.spec_det_data[i].list;
       for (var j = 0;j < childs.length;j++) {
         if(childs[j].active){
           curSelectNum++;
-          all_price += Number(childs[j].sale_price)
-          //propertyChildIds = propertyChildIds + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].spec_det_id +",";
-          propertyChildNames = propertyChildNames + that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name +"  ";
+          all_price = Number(childs[j].sale_price)
+          all_pid = Number(childs[j].spec_det_id);//规格的id
+          propertyChildNames = that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name;
         }
       }
     }
+
     var canSubmit = false;
     if (needSelectNum == curSelectNum) {//各个分类规格都必选一个
       canSubmit = true;
@@ -158,6 +174,7 @@ Page({
         selectSizePrice: all_price,
         //propertyChildIds: propertyChildIds,
         propertyChildNames: propertyChildNames,
+        childId: all_pid,//规格的id
         //buyNumMax: res.data.data.stores,
         //buyNumber: (res.data.data.stores > 0) ? 1 : 0
 
@@ -190,6 +207,7 @@ Page({
     //shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
     //shopCarMap.propertyChildIds=this.data.propertyChildIds;
     shopCarMap.label=this.data.propertyChildNames;
+    shopCarMap.childId = this.data.childId;
     shopCarMap.price = this.data.selectSizePrice;
     shopCarMap.left = "";
     shopCarMap.active = true;

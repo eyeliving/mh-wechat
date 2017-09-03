@@ -7,14 +7,13 @@ Page({
   },
 
   selectTap: function (e) {
-    var id = e.currentTarget.dataset.id;
+    var that = this;
+    var _index = e.currentTarget.dataset.index;
+    var _data = that.data.addressList[_index];
+    _data.is_default = 1;
     wx.request({
-      url: "https://api.it120.cc/"+ app.globalData.subDomain +'/user/shipping-address/update',
-      data: {
-        token:app.globalData.token,
-        id:id,
-        isDefault:'true'
-      },
+      url: app.globalData.domains + '/User/ModifyUserCartAddress',
+      data: _data,
       success: (res) =>{
         wx.navigateBack({})
       }
@@ -34,9 +33,7 @@ Page({
   },
   
   onLoad: function () {
-    console.log('onLoad')
 
-   
   },
   onShow : function () {
     this.initShippingAddress();
@@ -44,14 +41,15 @@ Page({
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: "https://api.it120.cc/"+ app.globalData.subDomain +'/user/shipping-address/list',
+      url: app.globalData.domains + '/User/GetUserCartAddress',
       data: {
-        token:app.globalData.token
+        rd_session: app.globalData.rd_session
       },
       success: (res) =>{
-        if (res.data.code == 0) {
+        var r = res.data;
+        if (r.ack == "success") {
           that.setData({
-            addressList:res.data.data
+            addressList:r.data
           });
         }
       }

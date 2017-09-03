@@ -84,23 +84,25 @@ Page({
     var goodslist = that.data.goodsList, _all_count = 0, productData = [];
     for (var i = 0; i < goodslist.length;i++){
       _all_count += Number(goodslist[i].number);
-      var _pobj = {"Product_id": goodslist[i].goodsId,"Product_count": goodslist[i].number,"Product_price": goodslist[i].price}
+      var _pobj = { "Product_id": goodslist[i].goodsId, "Product_count": goodslist[i].number, "Product_price": goodslist[i].price, spec_det_id1: goodslist[i].childId}
       productData.push(_pobj);
     }
     var orderData = {};
+    var curAddressData = that.data.curAddressData;
     //var User = that.globalData.users;
-    orderData.client_id = '';
+    //orderData.client_id = '';
+    orderData.rd_session = app.globalData.rd_session;
     orderData.order_amount = this.data.allGoodsPrice;
     orderData.order_count = _all_count;
     orderData.order_expfee = 0;
-    orderData.user_name = '大王';
-    orderData.tel_number = '13613007817';
-    orderData.province = '广东省';
-    orderData.city = '深圳市';
-    orderData.district = '龙华';
-    orderData.address = '民治世界金融中心';
+    orderData.user_name = curAddressData.cart_consignee;
+    orderData.tel_number = curAddressData.cart_mobile;
+    orderData.province = curAddressData.cart_province;
+    orderData.city = curAddressData.cart_city;
+    orderData.district = curAddressData.cart_district;
+    orderData.address = curAddressData.cart_address;
     //orderData.postal_code = User.postal_code;
-    orderData.exptime = '2017-09-07';
+    //orderData.exptime = '2017-09-07';
     orderData.leword = e.detail.value.remark;
     orderData.productData = productData;
     wx.request({
@@ -133,7 +135,7 @@ Page({
   initShippingAddress: function () {
     var that = this;
     wx.request({
-      url: app.globalData.domains + '/User/GetUserAddress',
+      url: app.globalData.domains + '/User/GetUserCartAddress',
       data: {
         rd_session: app.globalData.rd_session
       },
@@ -143,9 +145,7 @@ Page({
           var _address_list = r.data, curAddressData = {};
           for (var i=0;i<_address_list.length;i++){
             if (_address_list[i].is_default=='1'){
-              curAddressData.linkMan = _address_list[i].consignee;
-              curAddressData.mobile = _address_list[i].mobile;
-              curAddressData.address = _address_list[i].address;
+              curAddressData = _address_list[i];
             }
           }
           that.setData({

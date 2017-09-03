@@ -4,10 +4,10 @@ App({
     var that = this;
     var rd_session = wx.getStorageSync('rd_session') || '';
 		if(rd_session){
-        wx.checkSession({
-          success: function(){
+        //wx.checkSession({
+        //  success: function(){
             //session未过期，并且在本生命周期一直有效
-            //验证rd_session是否合法【可选】
+            //验证rd_session是否合法
             wx.request({
               url: that.globalData.domains + '/User/CheckLogin',
               data: {rd_session: rd_session},
@@ -27,13 +27,13 @@ App({
                 }
               }
             });
-          },
-          fail: function(){
-            //登录态过期 清空已失效的rd_session //每次login,后端都会更新rd_session有效期，所以登录态已过期，服务器端也可能过期了
-            wx.setStorage({key:'rd_session',data:''});
-            that.login();
-          }
-        });
+          //},
+        //   fail: function(){
+        //     //登录态过期 清空已失效的rd_session //每次login,后端都会更新rd_session有效期，所以登录态已过期，服务器端也可能过期了
+        //     wx.setStorage({key:'rd_session',data:''});
+        //     that.login();
+        //   }
+        // });
 		}else{
         that.login();
 		}
@@ -46,8 +46,8 @@ App({
           url: that.globalData.domains +"/User/Login",
           data: {
             code: res.code, 
-            app_id: 'wx1da05f244060447a', 
-            app_secret:'02e97eafc12217cbafc39fdaf8eda81e'
+            app_id: 'wx47a4216a540b6516', 
+            app_secret:'0899d87d8ef430a85671136528281603'
           },
           success: function (res) {
             var r = res.data;
@@ -79,7 +79,7 @@ App({
               client_name: _user.nickName,
               client_sex: _user.gender == 1 ? '男' :'女',
               client_head: _user.avatarUrl,
-              client_wechat_openid: that.globalData.openid,
+              openid: that.globalData.openid,
               client_province: _user.province,
               client_city: _user.city
             };
@@ -103,7 +103,7 @@ App({
     userInfo:null,
     subDomain:"mall",
 	  defaultsite:"https://api.it120.cc/",
-    domains: 'http://112.74.92.30',//https://shop.szzbjt.com
+    domains: 'https://shop.szzbjt.com',//'http://112.74.92.30',
     users:null,
     rd_session:null,
     openid:null
