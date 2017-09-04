@@ -56,10 +56,8 @@ Page({
       return
     }
     var city_name = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].name;
-    var district_name;
-    if (this.data.selDistrict == "请选择"){
-      district_name = city_name;
-    } else {
+    var district_name = '';
+    if (this.data.selDistrict != "请选择" && this.data.selDistrict!=''){
       district_name = commonCityData.cityData[this.data.selProvinceIndex].cityList[this.data.selCityIndex].districtList[this.data.selDistrictIndex].name;
     }
     if (address == ""){

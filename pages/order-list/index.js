@@ -2,7 +2,10 @@ var wxpay = require('../../utils/pay.js')
 var app = getApp()
 Page({
   data:{
-    statusType:["全部","待付款","待发货","待收货","已完成"],
+    //statusType:["全部","待付款","待发货","待收货","已完成"],
+     statusType: [{ status: '', name: "全部" }, 
+       { status: 'unpay', name: "待付款" }, { status: 'unpay', name:"待发货"}, 
+       { status: 'unpay', name: "待收货" }, { status: 'closed', name:"已完成"}],
     currentTpye:0,
     tabClass: ["", "", "", "", ""]
   },
@@ -15,10 +18,10 @@ Page({
      this.onShow();
   },
   orderDetail : function (e) {
-    var orderId = e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: "/pages/order-details/index?id=" + orderId
-    })
+    // var orderId = e.currentTarget.dataset.id;
+    // wx.navigateTo({
+    //   url: "/pages/order-details/index?id=" + orderId
+    // })
   },
   cancelOrderTap:function(e){
     var that = this;
@@ -111,31 +114,21 @@ Page({
     wx.showLoading({ title: '正在获取订单' });
     var that = this;
     var postData = {
-      token: app.globalData.rd_session
+      rd_session: app.globalData.rd_session,
+      status: that.data.statusType[that.data.currentTpye].status
     };
-    if (that.data.currentTpye == 1) {
-      postData.status = 0
-    }
-    if (that.data.currentTpye == 2) {
-      postData.status = 1
-    }
-    if (that.data.currentTpye == 3) {
-      postData.status = 2
-    }
-    if (that.data.currentTpye == 4) {
-      postData.status = 4
-    }
     //this.getOrderStatistics();
     wx.request({
       url: app.globalData.domains + "/Orders/OrdersLists",
       data: postData,
       success: (res) => {
         wx.hideLoading();
-        if (res.data.code == 0) {
+        var r = res.data;
+        if (r.ack == "success") {
           that.setData({
-            orderList: res.data.data.orderList,
-            logisticsMap : res.data.data.logisticsMap,
-            goodsMap : res.data.data.goodsMap
+            orderList: res.data.data.lists,
+            logisticsMap: {},
+            goodsMap: {}
           });
         } else {
           this.setData({

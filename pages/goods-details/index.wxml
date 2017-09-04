@@ -49,7 +49,7 @@
                 </view>
                 <view class="pop-goods-close" bindtap="closePopupTap"></view>
              </view>
-             <view class="size-label-box">
+             <!-- <view class="size-label-box">
                 <block wx:for="{{goodsDetail.spec_det_data}}" wx:for-item="property" wx:for-index="idx">
                 <view class="label">{{property.spec_name}}</view> 
                 <view class="label-item-box">
@@ -58,7 +58,17 @@
                     </view> 
                 </view>
                 </block>
-             </view> 
+             </view>  -->
+             <view class="size-label-box">
+                <block>
+                <view class="label">颜色</view> 
+                <view class="label-item-box">
+                    <view wx:for="{{goodsDetail.spec_det_data}}" wx:for-index="idx" class="label-item {{item.active ? 'active' : '' }}" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{item.spec_det_id}}" data-propertyname="{{item.spec_name}}" data-propertychildindex="{{index}}" data-propertychildid="{{item.spec_det_id}}" data-propertychildprice="{{item.sale_price}}" data-propertychildname="{{item.det_name}}">
+                        {{item.det_name}}=={{item.sale_price}}
+                    </view> 
+                </view>
+                </block>
+             </view>
              <view class="buy-num-box">
                 <view class="num-label">购买数量</view>
                 <view class="num-box">

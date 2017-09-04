@@ -118,20 +118,13 @@ Page({
   },
   labelItemTap: function(e) {
     var that = this;
-    /*
-    console.log(e)
-    console.log(e.currentTarget.dataset.propertyid)
-    console.log(e.currentTarget.dataset.propertyname)
-    console.log(e.currentTarget.dataset.propertychildid)
-    console.log(e.currentTarget.dataset.propertychildname)
-    */
     // 取消该分类下的子栏目所有的选中状态
-    var childs = that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list;
+    var childs = that.data.goodsDetail.spec_det_data;
     for(var i = 0;i < childs.length;i++){
-      that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list[i].active = false;
+      that.data.goodsDetail.spec_det_data[i].active = false;
     }
     // 设置当前选中状态
-    that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].list[e.currentTarget.dataset.propertychildindex].active = true;
+    that.data.goodsDetail.spec_det_data[e.currentTarget.dataset.propertyindex].active = true;
     // 获取所有的选中规格尺寸数据
     var needSelectNum = that.data.goodsDetail.spec_det_data.length;
     var curSelectNum = 0;
@@ -153,13 +146,13 @@ Page({
     //规格只有一类单选
     var all_price = 0,all_pid = '';
     for (var i = 0; i < that.data.goodsDetail.spec_det_data.length;i++) {
-      childs = that.data.goodsDetail.spec_det_data[i].list;
+      childs = that.data.goodsDetail.spec_det_data;
       for (var j = 0;j < childs.length;j++) {
         if(childs[j].active){
           curSelectNum++;
           all_price = Number(childs[j].sale_price)
           all_pid = Number(childs[j].spec_det_id);//规格的id
-          propertyChildNames = that.data.goodsDetail.spec_det_data[i].spec_name + ":" + childs[j].det_name;
+          propertyChildNames = "颜色:" + childs[j].det_name;
         }
       }
     }

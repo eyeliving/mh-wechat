@@ -103,7 +103,7 @@ App({
     userInfo:null,
     subDomain:"mall",
 	  defaultsite:"https://api.it120.cc/",
-    domains: 'https://shop.szzbjt.com',//'http://112.74.92.30',
+    domains: 'https://shop.szzbjt.com', //'http://112.74.92.30',//
     users:null,
     rd_session:null,
     openid:null

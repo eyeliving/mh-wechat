@@ -107,7 +107,7 @@ Page({
     orderData.productData = productData;
     wx.request({
       url: app.globalData.domains + "/Orders/CreateOrder",
-      method:'POST',
+      //method:'POST',
       header: {
         //'content-type': 'application/x-www-form-urlencoded'
       },
@@ -123,12 +123,25 @@ Page({
           })
           return;
         }
-        // 清空购物车数据
-        wx.removeStorageSync('shopCarInfo');
-        // 下单成功，跳转到订单管理界面
-        wx.reLaunch({
-          url: "/pages/order-list/index"
-        });
+
+        wx.requestPayment({
+          'timeStamp': r.data.timeStamp,
+          'nonceStr': r.data.nonceStr,
+          'package': r.data.package,
+          'signType': r.data.signType,
+          'paySign': r.data.paySign,
+          'success': function (res) {
+            // 清空购物车数据
+            wx.removeStorageSync('shopCarInfo');
+            // 下单成功，跳转到订单管理界面
+            wx.reLaunch({
+              url: "/pages/order-list/index"
+            });
+          },
+          'fail': function (res) {
+          }
+        })
+
       }
     })
   },
