@@ -84,7 +84,7 @@ Page({
     var goodslist = that.data.goodsList, _all_count = 0, productData = [];
     for (var i = 0; i < goodslist.length;i++){
       _all_count += Number(goodslist[i].number);
-      var _pobj = { "Product_id": goodslist[i].goodsId, "Product_count": goodslist[i].number, "Product_price": goodslist[i].price, spec_det_id1: goodslist[i].childId}
+      var _pobj = { "product_id": goodslist[i].goodsId, "product_count": goodslist[i].number, "product_price": goodslist[i].price, spec_det_id1: goodslist[i].childId}
       productData.push(_pobj);
     }
     var orderData = {};

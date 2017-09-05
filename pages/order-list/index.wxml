@@ -29,7 +29,7 @@
                 </scroll-view>
             </view>
             <view class="price-box">
-                <view class="total-price">合计：¥ {{item.amountReal}}</view>
+                <view class="total-price">合计：¥ {{item.order_amount}}</view>
                 <view class="btn cancel-btn" hidden="{{item.status==0? fslse : true}}" bindtap="cancelOrderTap"  data-id="{{item.id}}">取消订单</view>
                 <view class="btn topay-btn" hidden="{{item.status==0? fslse : true}}" bindtap="toPayTap" data-id="{{item.id}}" data-money="{{item.amountReal}}">马上付款</view>        
             </view>  
