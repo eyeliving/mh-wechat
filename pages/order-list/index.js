@@ -4,10 +4,13 @@ Page({
   data:{
     //statusType:["全部","待付款","待发货","待收货","已完成"],
      statusType: [{ status: '', name: "全部" }, 
-       { status: 'unpay', name: "待付款" }, { status: 'unpay', name:"待发货"}, 
-       { status: 'unpay', name: "待收货" }, { status: 'closed', name:"已完成"}],
+       { status: 'unpay', name: "待付款"}, 
+       { status: 'payed', name: "待发货"}, //已支付
+       { status: 'delivering', name: "待收货"}, 
+       { status: 'closed', name: "已完成"}],
     currentTpye:0,
-    tabClass: ["", "", "", "", ""]
+    tabClass: ["", "", "", "", ""],
+    page:1
   },
   statusTap:function(e){
      var curType =  e.currentTarget.dataset.index;
@@ -33,15 +36,18 @@ Page({
         if (res.confirm) {
           wx.showLoading();
           wx.request({
-            url: "https://api.it120.cc/" + app.globalData.subDomain + '/order/close',
+            url: app.globalData.domains + "/Orders/CancelOrder",
             data: {
-              token: app.globalData.token,
-              orderId: orderId
+              //rd_session: app.globalData.rd_session,
+              order_id: orderId
             },
             success: (res) => {
               wx.hideLoading();
-              if (res.data.code == 0) {
+              var r = res.data;
+              if (r.ack == "success") {
                 that.onShow();
+              }else{
+                wx.showModal({ title: '提示', content: r.errorMsg, showCancel: false });
               }
             }
           })
@@ -51,7 +57,31 @@ Page({
   },
   toPayTap:function(e){
     var orderId = e.currentTarget.dataset.id;
-    var money = e.currentTarget.dataset.money;
+    wx.request({
+      url: app.globalData.domains + "/Orders/WechatPayment",
+      data: {rd_session: app.globalData.rd_session,order_id: orderId},
+      success: (res) => {
+        wx.hideLoading();
+        var r = res.data;
+        if (r.ack == "success") {
+          wx.requestPayment({
+            'timeStamp': r.data.timeStamp,
+            'nonceStr': r.data.nonceStr,
+            'package': r.data.package,
+            'signType': r.data.signType,
+            'paySign': r.data.paySign,
+            'success': function (res) {
+                  wx.reLaunch({
+                    url: "/pages/order-list/index"
+                  });
+            },
+            'fail': function (res) {}
+          });
+        }else{
+          wx.showModal({ title: '提示', content: r.errorMsg, showCancel: false });
+        }
+      }
+    });
     wxpay.wxpay(app, money, orderId, "/pages/order-list/index");
   },
   onLoad:function(options){
@@ -111,49 +141,7 @@ Page({
     //      })
     //      return;
     // }
-    wx.showLoading({ title: '正在获取订单' });
-    var that = this;
-    var postData = {
-      rd_session: app.globalData.rd_session,
-      status: that.data.statusType[that.data.currentTpye].status
-    };
-    //this.getOrderStatistics();
-    wx.request({
-      url: app.globalData.domains + "/Orders/OrdersLists",
-      data: postData,
-      success: (res) => {
-        wx.hideLoading();
-        var r = res.data;
-        if (r.ack == "success") {
-          that.setData({
-            orderList: res.data.data.lists,
-            logisticsMap: {},
-            goodsMap: {}
-          });
-        } else {
-          this.setData({
-            orderList: null,
-            logisticsMap: {},
-            goodsMap: {}
-          });
-        }
-      },
-      fail:(res) => {
-        wx.hideLoading();
-        wx.showModal({
-           title: '提示',
-           content: '请求错误，请稍后尝试',showCancel:false,
-           success: function (res) {
-             console.log(res)
-            //  if (res.confirm) {
-               
-            //  }else if (res.cancel) {
-              
-            //  }
-           }
-        })
-      }
-    })
+    this.getListData(1);
     
   },
   onHide:function(){
@@ -170,6 +158,68 @@ Page({
   },
   onReachBottom: function() {
     // 页面上拉触底事件的处理函数
-  
+    this.setData({page: this.data.page+1});
+    this.getListData(this.data.page);
+  },
+  getListData:function(page){
+    wx.showLoading({ title: '正在获取订单' });
+    var that = this;
+    var postData = {
+      rd_session: app.globalData.rd_session,
+      status: that.data.statusType[that.data.currentTpye].status,
+      page: page,
+      page_size: 5
+    };
+    //this.getOrderStatistics();
+    wx.request({
+      url: app.globalData.domains + "/Orders/OrdersLists",
+      data: postData,
+      success: (res) => {
+        wx.hideLoading();
+        var r = res.data;
+        if (r.ack == "success") {
+          var _list = res.data.data.lists;
+          for (var i = 0; i < _list.length;i++){
+            if (_list[i].status == 'unpay'){
+              _list[i].status_tips = '待付款'
+            } else if (_list[i].status == 'payed') {
+              _list[i].status_tips = '待发货'
+            } else if (_list[i].status == 'delivering') {
+              _list[i].status_tips = '待收货'
+            } else if (_list[i].status == 'closed') {
+              _list[i].status_tips = '已完成'
+            } else if (_list[i].status == 'canceled') {
+              _list[i].status_tips = '已取消'
+            }
+          }
+          that.setData({
+            orderList: _list,
+            logisticsMap: {},
+            goodsMap: {}
+          });
+        } else {
+          this.setData({
+            orderList: null,
+            logisticsMap: {},
+            goodsMap: {}
+          });
+        }
+      },
+      fail: (res) => {
+        wx.hideLoading();
+        wx.showModal({
+          title: '提示',
+          content: '请求错误，请稍后尝试', showCancel: false,
+          success: function (res) {
+            console.log(res)
+            //  if (res.confirm) {
+
+            //  }else if (res.cancel) {
+
+            //  }
+          }
+        })
+      }
+    })
   }
 })

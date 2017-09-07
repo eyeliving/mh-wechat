@@ -100,7 +100,7 @@ Page({
     orderData.province = curAddressData.cart_province;
     orderData.city = curAddressData.cart_city;
     orderData.district = curAddressData.cart_district;
-    orderData.address = curAddressData.cart_address;
+    orderData.address = (curAddressData.cart_province + curAddressData.cart_city + curAddressData.cart_district + curAddressData.cart_address);
     //orderData.postal_code = User.postal_code;
     //orderData.exptime = '2017-09-07';
     orderData.leword = e.detail.value.remark;
