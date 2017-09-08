@@ -1,10 +1,10 @@
 <view class="container">
      <form bindsubmit="createOrder">
-        <view class="address-box" wx:if="{{isNeedLogistics > 0}}">
+        <view class="address-box" wx:if="{{isNeedLogistics > 0}}" bindtap="btn_address">
           <view class="add-address" hidden="{{curAddressData}}">
-              <view class="title" bindtap="addAddress">新增收货地址</view>
+              <view class="title">新增收货地址</view>
           </view>
-          <view class="show-address" hidden="{{!curAddressData}}" bindtap="selectAddress">
+          <view class="show-address" hidden="{{!curAddressData}}">
               <view class="name-tel">{{curAddressData.cart_consignee}}  {{curAddressData.cart_mobile}}</view>
               <view class="addr-text">{{curAddressData.cart_province + curAddressData.cart_city + curAddressData.cart_district + curAddressData.cart_address}}</view>
           </view>

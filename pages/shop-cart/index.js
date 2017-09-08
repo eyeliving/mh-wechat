@@ -119,10 +119,11 @@ Page({
       for(var i = 0 ; i < list.length ; i++){
           var curItem = list[i];
           if(curItem.active){
-            total+= parseFloat(curItem.price)*curItem.number;
+            //total+= parseFloat(curItem.price)*curItem.number;
+            total += (Number(curItem.price) * 10000 * Number(curItem.number));
           }
       }
-      return total;
+      return total/10000;
    },
    allSelect:function(){
       var list = this.data.goodsList.list;
@@ -233,21 +234,20 @@ Page({
      return saveHidden;
    },
    deleteSelected:function(){
-      var list = this.data.goodsList.list;
-      for(var i = 0 ; i < list.length ; i++){
-            var curItem = list[i];
-            if(curItem.active){
+     var list = this.data.goodsList.list;
+     for (var i=list.length-1;i>=0;i--){
+            if (list[i].active){
               list.splice(i,1);
             }
       }
      this.setGoodsList(this.getSaveHide(),this.totalPrice(),this.allSelect(),this.noSelect(),list);
     },
     toPayOrder:function(){
-      wx.showLoading();
       var that = this;
       if (this.data.goodsList.noSelect) {
         return;
       }
+      wx.showLoading();
       // 重新计算价格，判断库存
       var shopList = [];
       var shopCarInfoMem = wx.getStorageSync('shopCarInfo');

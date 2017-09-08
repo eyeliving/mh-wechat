@@ -1,4 +1,3 @@
-var wxpay = require('../../utils/pay.js')
 var app = getApp()
 Page({
   data:{
@@ -7,18 +6,21 @@ Page({
        { status: 'unpay', name: "待付款"}, 
        { status: 'payed', name: "待发货"}, //已支付
        { status: 'delivering', name: "待收货"}, 
-       { status: 'closed', name: "已完成"}],
+       { status: 'received', name: "已完成"}],
     currentTpye:0,
     tabClass: ["", "", "", "", ""],
-    page:1
+    page:1,
+    current_taps:0
   },
   statusTap:function(e){
-     var curType =  e.currentTarget.dataset.index;
-     this.data.currentTpye = curType
+     var curType_index =  e.currentTarget.dataset.index;
+     var curType_status = e.currentTarget.dataset.status;
+     //this.data.currentTpye = curType
      this.setData({
-      currentTpye:curType
+       currentTpye: curType_index,
+       currentTpye_status: curType_status,
      });
-     this.onShow();
+     this.onShow(curType_status);
   },
   orderDetail : function (e) {
     // var orderId = e.currentTarget.dataset.id;
@@ -82,7 +84,6 @@ Page({
         }
       }
     });
-    wxpay.wxpay(app, money, orderId, "/pages/order-list/index");
   },
   onLoad:function(options){
     // 生命周期函数--监听页面加载
@@ -121,7 +122,7 @@ Page({
       }
     })
   },
-  onShow:function(){
+  onShow:function(status){
     // 获取订单列表
     // if (!app.globalData.users){
     //      wx.showModal({
@@ -141,7 +142,7 @@ Page({
     //      })
     //      return;
     // }
-    this.getListData(1);
+    this.getListData(1, status);
     
   },
   onHide:function(){
@@ -161,12 +162,12 @@ Page({
     this.setData({page: this.data.page+1});
     this.getListData(this.data.page);
   },
-  getListData:function(page){
+  getListData: function (page, status){
     wx.showLoading({ title: '正在获取订单' });
     var that = this;
     var postData = {
       rd_session: app.globalData.rd_session,
-      status: that.data.statusType[that.data.currentTpye].status,
+      status: status||'',
       page: page,
       page_size: 5
     };
@@ -186,14 +187,21 @@ Page({
               _list[i].status_tips = '待发货'
             } else if (_list[i].status == 'delivering') {
               _list[i].status_tips = '待收货'
-            } else if (_list[i].status == 'closed') {
+            } else if (_list[i].status == 'received') {
               _list[i].status_tips = '已完成'
             } else if (_list[i].status == 'canceled') {
               _list[i].status_tips = '已取消'
             }
           }
+          var orderList = that.data.orderList
+          if (orderList && orderList.length > 0 && !status && status!=''){
+            orderList = orderList.concat(_list)
+          }else{
+            orderList = _list
+          }
+          if (orderList.length <= 0) { orderList=null}
           that.setData({
-            orderList: _list,
+            orderList: orderList,
             logisticsMap: {},
             goodsMap: {}
           });
@@ -221,5 +229,30 @@ Page({
         })
       }
     })
+  },
+  toPaySure:function(e){
+    wx.showModal({
+      title: '是否要确定收货？',
+      content: '',
+      success: function (res) {
+        if (res.confirm) {
+          var orderId = e.currentTarget.dataset.id;
+          wx.request({
+            url: app.globalData.domains + "/Orders/ConfirmOrderRecived",
+            data: { rd_session: app.globalData.rd_session, order_id: orderId },
+            success: (res) => {
+              var r = res.data;
+              if (r.ack == "success") {
+                wx.reLaunch({
+                  url: "/pages/order-list/index"
+                })
+              } else {
+                wx.showModal({ title: '提示', content: r.errorMsg, showCancel: false });
+              }
+            }
+          });
+        }
+      }
+    });
   }
 })

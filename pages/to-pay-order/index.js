@@ -17,7 +17,7 @@ Page({
   },
   onLoad: function (e) {
     var that = this;
-    var shopList = [];
+    var shopList = [],shopList_data = [];
     var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
     if (shopCarInfoMem && shopCarInfoMem.shopList) {
       shopList = shopCarInfoMem.shopList
@@ -27,24 +27,27 @@ Page({
 
     var goodsJsonStr = "[";
     for (var i =0; i < shopList.length; i++) {
-      var carShopBean = shopList[i];
-      // if (carShopBean.logisticsType > 0) {
-      //   isNeedLogistics = 1;
-      // }
-      allGoodsPrice += carShopBean.price * carShopBean.number
+      if (shopList[i].active){
+        shopList_data.push(shopList[i]);
+        var carShopBean = shopList[i];
+        // if (carShopBean.logisticsType > 0) {
+        //   isNeedLogistics = 1;
+        // }
+        allGoodsPrice += (carShopBean.price * 10000 * carShopBean.number)
 
-      var goodsJsonStrTmp = '';
-      if (i > 0){
-        goodsJsonStrTmp = ",";
+        var goodsJsonStrTmp = '';
+        if (i > 0) {
+          goodsJsonStrTmp = ",";
+        }
+        goodsJsonStrTmp += '{"goodsId":' + carShopBean.goodsId + ',"number":' + carShopBean.number + ',"propertyChildIds":"' + carShopBean.propertyChildIds + '","logisticsType":' + carShopBean.logisticsType + '}';
+        goodsJsonStr += goodsJsonStrTmp;
       }
-      goodsJsonStrTmp += '{"goodsId":'+ carShopBean.goodsId +',"number":'+ carShopBean.number +',"propertyChildIds":"'+ carShopBean.propertyChildIds +'","logisticsType":'+ carShopBean.logisticsType +'}';
-      goodsJsonStr += goodsJsonStrTmp;
     }
     goodsJsonStr += "]";
     that.setData({
-      goodsList:shopList,
+      goodsList: shopList_data,
       //isNeedLogistics:isNeedLogistics,
-      allGoodsPrice:allGoodsPrice,
+      allGoodsPrice: allGoodsPrice/10000,
       goodsJsonStr:goodsJsonStr
     });
 
@@ -170,14 +173,15 @@ Page({
       }
     })
   },
-  addAddress: function () {
-    wx.navigateTo({
-      url:"/pages/address-add/index"
-    })
-  },
-  selectAddress: function () {
-    wx.navigateTo({
-      url:"/pages/select-address/index"
-    })
+  btn_address: function(){
+    if (this.data.curAddressData){
+      wx.navigateTo({
+        url: "/pages/select-address/index"
+      })
+    }else{
+      wx.navigateTo({
+        url: "/pages/address-add/index"
+      })
+    }
   }
 })

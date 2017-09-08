@@ -64,7 +64,7 @@
                 <view class="label">颜色</view> 
                 <view class="label-item-box">
                     <view wx:for="{{goodsDetail.spec_det_data}}" wx:for-index="idx" class="label-item {{item.active ? 'active' : '' }}" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{item.spec_det_id}}" data-propertyname="{{item.spec_name}}" data-propertychildindex="{{index}}" data-propertychildid="{{item.spec_det_id}}" data-propertychildprice="{{item.sale_price}}" data-propertychildname="{{item.det_name}}">
-                        {{item.det_name}}=={{item.sale_price}}
+                        {{item.det_name}}
                     </view> 
                 </view>
                 </block>
