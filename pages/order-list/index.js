@@ -9,8 +9,9 @@ Page({
        { status: 'received', name: "已完成"}],
     currentTpye:0,
     tabClass: ["", "", "", "", ""],
-    page:1,
-    current_taps:0
+    page:0,
+    current_taps:0,
+    currentTpye_status:''
   },
   statusTap:function(e){
      var curType_index =  e.currentTarget.dataset.index;
@@ -19,8 +20,9 @@ Page({
      this.setData({
        currentTpye: curType_index,
        currentTpye_status: curType_status,
+       page:0
      });
-     this.onShow(curType_status);
+     this.onShow();
   },
   orderDetail : function (e) {
     // var orderId = e.currentTarget.dataset.id;
@@ -122,7 +124,7 @@ Page({
       }
     })
   },
-  onShow:function(status){
+  onShow:function(){
     // 获取订单列表
     // if (!app.globalData.users){
     //      wx.showModal({
@@ -142,7 +144,7 @@ Page({
     //      })
     //      return;
     // }
-    this.getListData(1, status);
+    this.getListData();
     
   },
   onHide:function(){
@@ -159,15 +161,15 @@ Page({
   },
   onReachBottom: function() {
     // 页面上拉触底事件的处理函数
-    this.setData({page: this.data.page+1});
-    this.getListData(this.data.page);
+   // this.setData({page: this.data.page+1});
+    this.getListData(true);
   },
-  getListData: function (page, status){
+  getListData: function (flag){
     wx.showLoading({ title: '正在获取订单' });
-    var that = this;
+    var that = this, page = this.data.page+1;
     var postData = {
       rd_session: app.globalData.rd_session,
-      status: status||'',
+      status: this.data.currentTpye_status,
       page: page,
       page_size: 5
     };
@@ -194,14 +196,20 @@ Page({
             }
           }
           var orderList = that.data.orderList
-          if (orderList && orderList.length > 0 && !status && status!=''){
-            orderList = orderList.concat(_list)
+          if (orderList && orderList.length > 0 && flag){
+            if(_list.length!=0){
+              orderList = orderList.concat(_list);
+            }else{
+              page = page - 1;
+            }
           }else{
             orderList = _list
+            page = 1;
           }
           if (orderList.length <= 0) { orderList=null}
           that.setData({
             orderList: orderList,
+            page:page,
             logisticsMap: {},
             goodsMap: {}
           });
@@ -209,7 +217,8 @@ Page({
           this.setData({
             orderList: null,
             logisticsMap: {},
-            goodsMap: {}
+            goodsMap: {},
+            page: 0
           });
         }
       },
