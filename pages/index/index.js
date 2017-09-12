@@ -60,7 +60,7 @@ Page({
   onLoad: function () {
     var that = this
     wx.setNavigationBarTitle({
-      title: wx.getStorageSync('mallName')
+      title: '首页'
     })
     /*
     //调用应用实例的方法获取全局数据

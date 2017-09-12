@@ -22,7 +22,7 @@ Page({
        currentTpye_status: curType_status,
        page:0
      });
-     this.onShow();
+     this.getListData();
   },
   orderDetail : function (e) {
     // var orderId = e.currentTarget.dataset.id;
@@ -93,7 +93,7 @@ Page({
   },
   onReady:function(){
     // 生命周期函数--监听页面初次渲染完成
- 
+    this.getListData();
   },
   getOrderStatistics : function () {
     var that = this;
@@ -144,7 +144,7 @@ Page({
     //      })
     //      return;
     // }
-    this.getListData();
+    //
     
   },
   onHide:function(){
