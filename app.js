@@ -67,7 +67,7 @@ App({
       }
     });
   },
-  registerUser: function () {
+  registerUser: function (cb) {
     var that = this;
     //wx.login一定会登录过，所以直接调用wx.getUserInfo
     wx.getUserInfo({
@@ -87,12 +87,46 @@ App({
               url: that.globalData.domains + '/User/CreateUser',
               data: _data,
               success: (res) =>{
-                var r = res.data;
+                var r = res.data,flag = true;
                 if (r.ack == 'success') {
                   that.globalData.rd_session = r.data.rd_session;
                   wx.setStorage({key:'rd_session',data:r.data.rd_session});
                 }else{
                   wx.showModal({title: '提示',content: r.errorMsg,showCancel: false});
+                  flag = false;
+                }
+                if(cb){
+                  return typeof cb == "function" && cb(flag)
+                } 
+              }
+            })
+          },
+          fail: function (res) { //拒绝授权
+            wx.showModal({
+              title: '用户未授权',
+              content: '如需正常使用，请点击授权按钮，勾选用户信息并点击确定。',
+              showCancel: false,
+              success: function (res) {
+                if(res.confirm){
+                  wx.openSetting({
+                    success: (res) => {
+                      if(res.authSetting["scope.userInfo"]) { 
+                        // 如果成功打开授权,再次注册
+                        that.registerUser();
+                      }else {
+                        // 如果用户依然拒绝授权
+                        //console.log('拒绝授权了')
+                        if (cb) {
+                          return typeof cb == "function" && cb(false)
+                        }
+                      } 
+                    },
+                    fail: function () { //调用失败，授权登录不成功
+                      if (cb) {
+                        return typeof cb == "function" && cb(false)
+                      }
+                    }
+                  })
                 }
               }
             })

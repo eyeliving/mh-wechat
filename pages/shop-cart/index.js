@@ -247,7 +247,7 @@ Page({
       if (this.data.goodsList.noSelect) {
         return;
       }
-      wx.showLoading();
+      //wx.showLoading();
       // 重新计算价格，判断库存
       var shopList = [];
       var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
@@ -261,10 +261,23 @@ Page({
       //var doneNumber = 0;
       //var needDoneNUmber = shopList.length;
 
-      wx.hideLoading();
-      wx.navigateTo({
-        url: "/pages/to-pay-order/index"
-      });
+      
+      if (!app.globalData.rd_session){
+        app.registerUser(function(flag){
+          //wx.hideLoading();
+          if(flag){
+            wx.navigateTo({
+              url: "/pages/to-pay-order/index"
+            });
+          }
+        })
+      }else{
+        //wx.hideLoading();
+        wx.navigateTo({
+          url: "/pages/to-pay-order/index"
+        });
+      }
+      
 
     },
     navigateToPayOrder:function () {
