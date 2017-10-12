@@ -81,7 +81,11 @@ App({
               client_head: _user.avatarUrl,
               openid: that.globalData.openid,
               client_province: _user.province,
-              client_city: _user.city
+              client_city: _user.city,
+
+              encryptedData: res.encryptedData,
+              iv: res.iv,
+              signature: res.signature
             };
             wx.request({
               url: that.globalData.domains + '/User/CreateUser',
